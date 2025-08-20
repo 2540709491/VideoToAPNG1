@@ -1,0 +1,99 @@
+name: .NET Core Release Build & Publish
+
+on:
+  push:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      Project_Path: MP4TOAPNG\MP4TOAPNG.csproj
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Publish Release Build
+      run: |
+        dotnet publish $env:Project_Path `
+          -c Release `
+          -r win-x64 `
+          --self-contained true `
+          -p:PublishSingleFile=true `
+          -p:IncludeNativeLibrariesForSelfExtract=true
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: VideoToApng-Release
+        path: VideoToApng/bin/Release/net8.0-windows/win-x64/publish/
+
+  release:
+    name: Create Releases
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Extract commit messages
+      id: extract-commits
+      run: |        
+        PREV_TAG=$(git describe --tags --abbrev=0 --match "VideoToApng_*" 2>/dev/null || git rev-list --max-parents=0 HEAD)
+        COMMITS=$(git log --pretty=format:"- %s (%h)%n  %b" $PREV_TAG..HEAD)
+        if [ -z "$COMMITS" ]; then
+          COMMITS="- No new commits since last release"
+        fi
+        echo "COMMIT_NOTES<<EOF" >> $GITHUB_ENV
+        echo "### 更新内容" >> $GITHUB_ENV
+        echo "$COMMITS" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    - name: Generate Valid Version Tag
+      id: version
+      run: |
+        echo "VERSION=VideoToApng_$(date -u +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+        echo "RELEASE_DATE=$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+        echo "Generated tag: $VERSION"
+
+    - name: Create Release in Source Repo
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.VERSION }}
+        release_name: "Release ${{ env.VERSION }}"
+        body: |
+          VideoToApng 发布版本 (${{ env.RELEASE_DATE }})
+          此版本为自包含单文件应用程序。
+          
+          ${{ env.COMMIT_NOTES }}
+        draft: false
+        prerelease: false
+        commitish: ${{ github.sha }}
+        asset_content_type: application/octet-stream
+      id: create_source_release
+    - name: Upload to Source Repo
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_source_release.outputs.upload_url }}
+        asset_path: artifact/VideoToApng.exe
+        asset_name: VideoToApng-${{ env.VERSION }}.exe
+        asset_content_type: application/octet-stream

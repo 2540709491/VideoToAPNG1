@@ -1,0 +1,39 @@
+﻿<Window x:Class="MP4TOAPNG.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MP4TOAPNG"
+        mc:Ignorable="d" AllowDrop="True" Drop="Window_Drop"
+        Title="视频转APNG动画" Height="600" Width="800" Background="{StaticResource 素黑}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="150"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Border BorderThickness="2" BorderBrush="{StaticResource 小黑绿}" Margin="5,5,5,5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="TextBox_DropFile" Foreground="{StaticResource 小黑绿}" Text="拖入视频文件" TextAlignment="Center" FontSize="24" FontWeight="Bold" VerticalAlignment="Center"></TextBlock>
+                <Border Grid.Row="1" BorderThickness="1" BorderBrush="{StaticResource 小黑绿}" Margin="10,0,10,10" Padding="10">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="并行处理数:" Foreground="{StaticResource 小黑绿}" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold"/>
+                        <Slider x:Name="ParallelSlider" Width="150" Minimum="1" Maximum="10" Value="1" 
+                                TickFrequency="1" IsSnapToTickEnabled="True" 
+                                Foreground="{StaticResource 小黑绿}" 
+                                ValueChanged="ParallelSlider_ValueChanged"
+                                Style="{StaticResource HEISliderStyle}"/>
+                        <TextBlock x:Name="ParallelValueText" Text="1" Foreground="{StaticResource 小黑绿}" 
+                                   VerticalAlignment="Center" Margin="10,0,0,0" Width="20" FontWeight="Bold"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+        <ScrollViewer Grid.Row="1" Margin="5,5,5,5" Style="{StaticResource MyScrollViewerStyle}">
+            <StackPanel x:Name="FileListPanel" />
+        </ScrollViewer>
+    </Grid>
+</Window>

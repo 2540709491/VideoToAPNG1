@@ -1,0 +1,657 @@
+﻿<Application x:Class="afdianBOT.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:afdianBOT"
+             StartupUri="/Windows/MainWindow.xaml">
+    <Application.Resources>
+        <SolidColorBrush x:Key="小黑绿" Color="#FF96AD5F" />
+        <SolidColorBrush x:Key="小黑青" Color="#FF101721" />
+        <SolidColorBrush x:Key="素黑" Color="#FF131313" />
+        <SolidColorBrush x:Key="无限灰" Color="#FF6B8795"/>
+        <SolidColorBrush x:Key="无限粉" Color="#FFCFE2E0"/>
+        <!--Thumb样式 -->
+        <Style x:Key="MyScrollBarThumbStyle" TargetType="Thumb">
+            <Setter Property="Background" Value="#FF96ad5f" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="thumbBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#FF96ad5f"
+                                BorderThickness="1"
+                                CornerRadius="3" />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="thumbBorder" Property="Background" Value="#CC96ad5f" />
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="thumbBorder" Property="Background" Value="#9996ad5f" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--ScrollBar样式 -->
+        <Style x:Key="HEIScrollBarStyle" TargetType="ScrollBar">
+            <Setter Property="Background" Value="#FF333333" />   <!-- 轨道背景 -->
+            <Setter Property="Foreground" Value="#FF888888" />   <!-- 箭头/按钮 -->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Track x:Name="PART_Track"
+                                   IsDirectionReversed="True">
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource MyScrollBarThumbStyle}" />
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+ <!--GroupBox样式 -->
+        <Style x:Key="CustomGroupBoxStyle" TargetType="GroupBox">            <Setter Property="BorderBrush" Value="{StaticResource 小黑绿}"></Setter>
+            <Setter Property="BorderThickness" Value="2"></Setter>
+            <Setter Property="Background" Value="{StaticResource 小黑青}"></Setter>
+            <Setter Property="Margin" Value="10 10 10 10"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Header部分 -->
+                            <Border Grid.Row="0"
+                                    Background="{TemplateBinding BorderBrush}"
+
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="5,5,0,0">
+                                <ContentPresenter ContentSource="Header"
+                                                  Margin="10,5,10,5"
+                                                  TextBlock.Foreground="White"
+                                                  TextBlock.FontWeight="Bold"
+                                                  TextBlock.FontSize="18"
+                                                  HorizontalAlignment="Left" />
+                            </Border>
+
+                            <!-- Content部分 -->
+                            <Border Grid.Row="1"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="0,0,5,5"
+                                    Margin="0,-1,0,0">
+                                <ContentPresenter Margin="{TemplateBinding Padding}" />
+                            </Border>
+                            
+                            <!-- 禁用状态遮罩 -->
+                            <Grid x:Name="DisabledLayer" Grid.Row="1" Background="#80000000" Visibility="Collapsed">
+                                <TextBlock Text="该GroupBox已禁用" 
+                                           Foreground="{StaticResource 小黑绿}" 
+                                           HorizontalAlignment="Center" 
+                                           VerticalAlignment="Center" 
+                                           FontSize="36" 
+                                           FontWeight="Bold"/>
+                            </Grid>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="DisabledLayer" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--ScrollViewer样式-->
+        <Style x:Key="MyScrollViewerStyle" TargetType="ScrollViewer">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid>
+                            <!-- 定义Grid的行列 -->
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!-- 内容呈现区域 -->
+                            <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
+                                                    Grid.Row="0" Grid.Column="0" />
+
+                            <!-- 垂直滚动条 -->
+                            <ScrollBar x:Name="PART_VerticalScrollBar"
+                                       Orientation="Vertical"
+                                       Style="{StaticResource HEIScrollBarStyle}"
+                                       Grid.Row="0" Grid.Column="1"
+                                       Value="{TemplateBinding VerticalOffset}"
+                                       Maximum="{TemplateBinding ScrollableHeight}"
+                                       ViewportSize="{TemplateBinding ViewportHeight}"
+                                       Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" />
+
+                            <!-- 水平滚动条 -->
+                            <ScrollBar x:Name="PART_HorizontalScrollBar"
+                                       Orientation="Horizontal"
+                                       Style="{StaticResource HEIScrollBarStyle}"
+                                       Grid.Row="1" Grid.Column="0"
+                                       Value="{TemplateBinding HorizontalOffset}"
+                                       Maximum="{TemplateBinding ScrollableWidth}"
+                                       ViewportSize="{TemplateBinding ViewportWidth}"
+                                       Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--Button样式 -->
+        <Style x:Key="HEIButtonStyle"
+               TargetType="{x:Type Button}">
+            <!-- 默认值 -->
+            <Setter Property="Background" Value="{StaticResource 小黑青}" />
+            <Setter Property="BorderBrush" Value="#96ad5f" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Foreground" Value="#96ad5f" />
+            <Setter Property="Padding" Value="12 6" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Width" Value="79" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <!-- 关键：Border 负责圆角和边框 -->
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5">
+                            <ContentPresenter x:Name="content"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              TextBlock.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+
+                        <!-- 触发器：鼠标悬停、按下、禁用 -->
+                        <ControlTemplate.Triggers>
+                            <!-- 悬停 -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#37465B" />
+                            </Trigger>
+                            <!-- 按下 -->
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1E2B3D" />
+                            </Trigger>
+                            <!-- 禁用 -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="#FFCCCCCC" />
+                                <Setter TargetName="border" Property="BorderBrush" Value="#FF999999" />
+                                <Setter TargetName="content" Property="TextBlock.Foreground" Value="#FF666666" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <!-- <EventTrigger RoutedEvent="Button.Click"> -->
+                <!--     <EventTrigger.Actions> -->
+                <!--         <SoundPlayerAction Source="/Resources/sounds/Button_Click.wav" /> -->
+                <!--     </EventTrigger.Actions> -->
+                <!-- </EventTrigger> -->
+            </Style.Triggers>
+        </Style>
+        <!-- ComboBoxItem样式 -->
+        <Style x:Key="HEIComboBoxItemStyle" TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="Background" Value="{StaticResource 小黑青}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="10,5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#37465B" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1E2B3D" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- ComboBox样式 -->
+        <Style x:Key="HEIComboBoxStyle" TargetType="{x:Type ComboBox}">
+            <Setter Property="Background" Value="{StaticResource 小黑青}" />
+            <Setter Property="BorderBrush" Value="#96ad5f" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource HEIComboBoxItemStyle}" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="20" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 背景边框 -->
+                            <Border x:Name="border"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="5" />
+
+                            <!-- 显示选中项内容的区域 -->
+                            <ContentPresenter x:Name="contentPresenter"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Center"
+                                              Margin="10,0,0,0"
+                                              Grid.Column="0" />
+
+                            <!-- 下拉箭头 -->
+                            <Path x:Name="arrow"
+                                  Grid.Column="1"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,0,0"
+                                  Fill="{StaticResource 小黑绿}"
+                                  Data="M 0 0 L 4 4 L 8 0 Z" />
+
+                            <!-- 透明的ToggleButton，覆盖整个区域 -->
+                            <ToggleButton x:Name="toggleButton"
+                                          Grid.Column="0"
+                                          Grid.ColumnSpan="2"
+                                          Background="Transparent"
+                                          BorderBrush="Transparent"
+                                          BorderThickness="0"
+                                          ClickMode="Press"
+                                          Focusable="False"
+                                          IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                        <Border Background="Transparent"
+                                                BorderBrush="Transparent"
+                                                BorderThickness="0" />
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <!-- 下拉弹窗 -->
+                            <Popup x:Name="PART_Popup"
+                                   AllowsTransparency="True"
+                                   IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                   Placement="Bottom"
+                                   PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                   PopupAnimation="Slide">
+                                <Border x:Name="dropDownBorder"
+                                        Background="{StaticResource 小黑青}"
+                                        BorderBrush="{StaticResource 小黑绿}"
+                                        BorderThickness="2"
+                                        CornerRadius="0,0,5,5">
+                                    <ScrollViewer x:Name="DropDownScrollViewer">
+                                        <ItemsPresenter x:Name="ItemsPresenter"
+                                                        KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#37465B" />
+                            </Trigger>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1E2B3D" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- TextBox样式 -->
+        <Style x:Key="HEITextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource 小黑青}" />
+            <Setter Property="BorderBrush" Value="{StaticResource 小黑绿}" />
+            <Setter Property="Foreground" Value="{StaticResource 小黑绿}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                          Style="{StaticResource MyScrollViewerStyle}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#CC96ad5f" />
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- DatePicker样式 -->
+        <Style x:Key="HEIDatePickerStyle" TargetType="DatePicker">
+            <Setter Property="Background" Value="{StaticResource 小黑青}" />
+            <Setter Property="BorderBrush" Value="{StaticResource 小黑绿}" />
+            <Setter Property="Foreground" Value="{StaticResource 小黑绿}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DatePicker">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3">
+                            <Grid x:Name="PART_Root"
+                                  HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                                  VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                                <Grid.Resources>
+                                    <SolidColorBrush x:Key="DisabledBrush" Color="#A5FFFFFF" />
+                                    <ControlTemplate x:Key="DropDownButtonTemplate" TargetType="Button">
+                                        <Grid>
+                                            <Border x:Name="Bg"
+                                                    Background="Transparent" />
+                                            <Path x:Name="Arrow"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Data="M0,0 L6,6 L12,0 Z"
+                                                  Fill="{TemplateBinding Foreground}" />
+                                            <VisualStateManager.VisualStateGroups>
+                                                <VisualStateGroup x:Name="CommonStates">
+                                                    <VisualState x:Name="Normal" />
+                                                    <VisualState x:Name="MouseOver">
+                                                        <Storyboard>
+                                                            <ColorAnimation Duration="0"
+                                                                            Storyboard.TargetName="Arrow"
+                                                                            Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)"
+                                                                            To="#CC96ad5f" />
+                                                        </Storyboard>
+                                                    </VisualState>
+                                                    <VisualState x:Name="Pressed">
+                                                        <Storyboard>
+                                                            <ColorAnimation Duration="0"
+                                                                            Storyboard.TargetName="Arrow"
+                                                                            Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)"
+                                                                            To="#FFFFFF" />
+                                                        </Storyboard>
+                                                    </VisualState>
+                                                    <VisualState x:Name="Disabled">
+                                                        <Storyboard>
+                                                            <DoubleAnimation Duration="0"
+                                                                             Storyboard.TargetName="Arrow"
+                                                                             Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                                             To=".5" />
+                                                        </Storyboard>
+                                                    </VisualState>
+                                                </VisualStateGroup>
+                                            </VisualStateManager.VisualStateGroups>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Grid.Resources>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <DatePickerTextBox x:Name="PART_TextBox"
+                                                   Grid.Column="0"
+                                                   Style="{StaticResource HEITextBoxStyle}"
+                                                   Background="{TemplateBinding Background}"
+                                                   TextAlignment="Center"
+                                                   FontSize="16"
+                                                   MinWidth="80"
+                                                   BorderBrush="Transparent"
+                                                   Foreground="{TemplateBinding Foreground}"
+                                                   Padding="0,0,0,0"
+                                                   HorizontalContentAlignment="Center"
+                                                   VerticalContentAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                <Button x:Name="PART_Button"
+                                        Grid.Column="1"
+                                        Template="{StaticResource DropDownButtonTemplate}"
+                                        Foreground="{TemplateBinding Foreground}"
+                                        Width="20"
+                                        VerticalAlignment="Stretch"
+                                        HorizontalAlignment="Center"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="1"
+                                        IsTabStop="False" />
+                                <Grid x:Name="PART_DisabledVisual"
+                                      Grid.Column="0"
+                                      Grid.ColumnSpan="2"
+                                      IsHitTestVisible="False"
+                                      Opacity="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Rectangle x:Name="DisabledVisualElement"
+                                               Grid.Column="0"
+                                               Grid.ColumnSpan="2"
+                                               Fill="{StaticResource DisabledBrush}"
+                                               RadiusX="3"
+                                               RadiusY="3"
+                                               Opacity="0" />
+                                </Grid>
+                                <Popup x:Name="PART_Popup"
+                                       AllowsTransparency="True"
+                                       Placement="Bottom"
+                                       PlacementTarget="{Binding ElementName=PART_TextBox}"
+                                       StaysOpen="False" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#CC96ad5f" />
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--ProcessBar样式-->
+        <Style x:Key="HEIProgressBarStyle" TargetType="{x:Type ProgressBar}">
+            <Setter Property="Foreground" Value="{StaticResource 小黑绿}" />
+            <Setter Property="Background" Value="{StaticResource 小黑青}" />
+            <Setter Property="Background" Value="{StaticResource 小黑青}" />
+            <Setter Property="BorderBrush" Value="{StaticResource 小黑绿}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ProgressBar}">
+                        <Grid x:Name="TemplateRoot">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Determinate" />
+                                    <VisualState x:Name="Indeterminate">
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IndeterminateGradientFill"
+                                                Storyboard.TargetProperty="Opacity"
+                                                From="0.3" To="1" Duration="0:0:1"
+                                                AutoReverse="True" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}" />
+                            <Rectangle x:Name="PART_Track" />
+                            <Grid x:Name="PART_Indicator"
+                                  HorizontalAlignment="Left"
+                                  ClipToBounds="true">
+                                <Rectangle x:Name="Indicator"
+                                           Fill="{TemplateBinding Foreground}" />
+                                <Rectangle x:Name="IndeterminateGradientFill"
+                                           Fill="{TemplateBinding Foreground}"
+                                           Margin="0"
+                                           Opacity="0.8"
+                                           Visibility="Collapsed" />
+                            </Grid>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsIndeterminate" Value="true">
+                                <Setter TargetName="Indicator" Property="Visibility" Value="Collapsed" />
+                                <Setter TargetName="IndeterminateGradientFill" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--Slider样式-->
+        <Style x:Key="HEISliderStyle" TargetType="{x:Type Slider}">
+            <Setter Property="Background" Value="{StaticResource 小黑青}" />
+            <Setter Property="BorderBrush" Value="{StaticResource 小黑绿}" />
+            <Setter Property="Foreground" Value="{StaticResource 小黑绿}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Slider}">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TickBar x:Name="TopTick" 
+                                         Visibility="Collapsed" 
+                                         Fill="{TemplateBinding Foreground}" 
+                                         Placement="Top" 
+                                         Height="4" 
+                                         Grid.Row="0" />
+                                <Border x:Name="TrackBackground" 
+                                        Background="{StaticResource 小黑青}" 
+                                        BorderBrush="{StaticResource 小黑绿}" 
+                                        BorderThickness="1" 
+                                        CornerRadius="2" 
+                                        Height="4" 
+                                        Grid.Row="1" 
+                                        VerticalAlignment="Center">
+                                    <Canvas Margin="-6,-1">
+                                        <Rectangle x:Name="PART_SelectionRange" 
+                                                   Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" 
+                                                   Height="4.0" 
+                                                   Visibility="Hidden" />
+                                    </Canvas>
+                                </Border>
+                                <Track x:Name="PART_Track" Grid.Row="1" >
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton Command="{x:Static Slider.DecreaseLarge}" 
+                                                      Background="{StaticResource 小黑绿}" 
+                                                      BorderBrush="{StaticResource 小黑绿}" 
+                                                      BorderThickness="1">
+                                            <RepeatButton.Template>
+                                                <ControlTemplate TargetType="RepeatButton">
+                                                    <Border Background="{TemplateBinding Background}" 
+                                                            BorderBrush="{TemplateBinding BorderBrush}" 
+                                                            BorderThickness="{TemplateBinding BorderThickness}" 
+                                                            CornerRadius="2"/>
+                                                </ControlTemplate>
+                                            </RepeatButton.Template>
+                                        </RepeatButton>
+                                    </Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton Command="{x:Static Slider.IncreaseLarge}" 
+                                                      Background="Transparent" 
+                                                      BorderBrush="Transparent">
+                                            <RepeatButton.Template>
+                                                <ControlTemplate TargetType="RepeatButton">
+                                                    <Border Background="{TemplateBinding Background}" 
+                                                            BorderBrush="{TemplateBinding BorderBrush}" 
+                                                            BorderThickness="{TemplateBinding BorderThickness}" />
+                                                </ControlTemplate>
+                                            </RepeatButton.Template>
+                                        </RepeatButton>
+                                    </Track.IncreaseRepeatButton>
+                                    <Track.Thumb>
+                                        <Thumb x:Name="Thumb" 
+                                               Focusable="False" 
+                                               Width="16" 
+                                               Height="16" 
+                                               Background="{StaticResource 小黑绿}" 
+                                               BorderBrush="{StaticResource 小黑绿}">
+                                            <Thumb.Template>
+                                                <ControlTemplate TargetType="Thumb">
+                                                    <Border Background="{TemplateBinding Background}" 
+                                                            BorderBrush="{TemplateBinding BorderBrush}" 
+                                                            BorderThickness="1" 
+                                                            CornerRadius="8"/>
+                                                </ControlTemplate>
+                                            </Thumb.Template>
+                                        </Thumb>
+                                    </Track.Thumb>
+                                </Track>
+                                <TickBar x:Name="BottomTick" 
+                                         Visibility="Collapsed" 
+                                         Fill="{TemplateBinding Foreground}" 
+                                         Placement="Bottom" 
+                                         Height="4" 
+                                         Grid.Row="2" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Thumb" Property="Background" Value="#CC96ad5f" />
+                                <Setter TargetName="Thumb" Property="BorderBrush" Value="#CC96ad5f" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+    </Application.Resources>
+</Application>
