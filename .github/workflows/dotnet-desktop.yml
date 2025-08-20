@@ -30,13 +30,14 @@ jobs:
           -r win-x64 `
           --self-contained true `
           -p:PublishSingleFile=true `
-          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:IncludeNativeLibrariesForSelfExtract=true `
+          -p:EnableCompressionInSingleFile=true
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: VideoToApng-Release
-        path: VideoToApng/bin/Release/net8.0-windows/win-x64/publish/
+        path: MP4TOAPNG/bin/Release/net8.0-windows/win-x64/publish/
 
   release:
     name: Create Releases
@@ -50,6 +51,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
+    - name: Download Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: VideoToApng-Release
+        path: artifact/
 
     - name: Extract commit messages
       id: extract-commits
@@ -86,14 +93,13 @@ jobs:
         draft: false
         prerelease: false
         commitish: ${{ github.sha }}
-        asset_content_type: application/octet-stream
-      id: create_source_release
+
     - name: Upload to Source Repo
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_source_release.outputs.upload_url }}
-        asset_path: artifact/MP4TOPNG.exe
+        asset_path: artifact/MP4TOAPNG.exe
         asset_name: VideoToApng-${{ env.VERSION }}.exe
         asset_content_type: application/octet-stream
