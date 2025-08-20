@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: windows-latest
     env:
-      Project_Path: MP4TOAPNG\MP4TOAPNG.csproj
+      Project_Path: MP4TOAPNG\VideoToApng.csproj
 
     steps:
     - name: Checkout
